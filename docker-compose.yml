@@ -1,0 +1,54 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - soft
+
+  node-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - DB_HOST=db
+      - DB_USER=${MYSQL_USER}
+      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - DB_NAME=${MYSQL_DATABASE}
+      - DB_PORT=${MYSQL_PORT}
+    depends_on:
+      - redis
+      - db
+    links:
+      - db
+      - redis
+    networks:
+      - soft
+    
+  db:
+    image: mysql:5.7
+    container_name: db
+    restart: unless-stopped
+    ports:
+        - "3306:3306"
+    env_file: .env
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - db:/var/lib/mysql
+    networks:
+      - soft
+
+networks:
+  soft:
+
+volumes:
+  db:

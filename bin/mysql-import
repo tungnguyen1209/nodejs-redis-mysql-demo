@@ -1,0 +1,5 @@
+#!/bin/bash
+[ -z "$1" ] && echo "Example: bin/mysql-import database/db.sql" && exit
+source .env
+winpty docker compose exec -T db mysql -hdb -u${MYSQL_USER} -p${MYSQL_PASSWORD} ${MYSQL_DATABASE} < "$@"
+echo "The database is successfully imported at $@"
