@@ -15,8 +15,6 @@ const client = redis.createClient({
     await client.connect()
 })();
 
-app.use(cors(corsOptions));
-
 db.sequelize.sync()
     .then(() => {
         console.log("Synced db.");
